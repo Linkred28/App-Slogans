@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, ChangeEvent, useRef, useEffect } from 'react';
 import { fileToBase64 } from './utils/fileUtils';
 import { 
@@ -33,10 +32,33 @@ const MegaphoneIcon: React.FC<{className?: string}> = ({ className }) => (<svg c
 const TShirtIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 9 9 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg> );
 const CardIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-1.6-2.926 1.28-1.28a8.741 8.741 0 0 1-12.8 12.8l-1.28-1.28a8.741 8.741 0 0 1 12.8-12.8Z" /><rect x="3" y="6" width="18" height="12" rx="2" ry="2" strokeWidth={1.5} /></svg> );
 const SignIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72L4.318 3.44A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72m-13.5 8.65h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .415.336.75.75.75Z" /></svg> );
-
+const MugIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 1.5 1.5m-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5v2.25a1.5 1.5 0 0 0 1.5 1.5h9.75a1.5 1.5 0 0 0 1.5-1.5V5.25a1.5 1.5 0 0 0-1.5-1.5H6.75a1.5 1.5 0 0 0-1.5 1.5m12.75 3.75h1.5a2.25 2.25 0 0 0 2.25-2.25v-1.5a2.25 2.25 0 0 0-2.25-2.25h-1.5m-12 4.5H3.75m0 4.5h1.5m-1.5-4.5a1.5 1.5 0 0 0-1.5 1.5v2.25a1.5 1.5 0 0 0 1.5 1.5" /></svg> );
+const NeonIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg> );
+const NotebookIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg> );
+const PhoneIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg> );
+const HoodieIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 9 9 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6" /></svg> );
+const DownloadIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> );
+const PenIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> );
+const ThermosIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg> );
+const ToteIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg> );
 
 const STYLES = ["Minimalista", "Moderno", "Vintage", "Geométrico", "3D", "Abstracto", "Lujo", "Orgánico", "Tecnológico", "Retro"];
 const EDIT_STYLES = ["Mantener Original", ...STYLES];
+
+// Mockup definitions for mapping
+const MOCKUP_TYPES = [
+    { id: 't-shirt', label: 'Camiseta', icon: TShirtIcon },
+    { id: 'hoodie', label: 'Sudadera', icon: HoodieIcon },
+    { id: 'mug', label: 'Taza', icon: MugIcon },
+    { id: 'pen', label: 'Pluma', icon: PenIcon },
+    { id: 'thermos', label: 'Termo', icon: ThermosIcon },
+    { id: 'tote-bag', label: 'Bolsa', icon: ToteIcon },
+    { id: 'neon', label: 'Neón', icon: NeonIcon },
+    { id: 'business-card', label: 'Tarjeta', icon: CardIcon },
+    { id: 'signage', label: 'Letrero', icon: SignIcon },
+    { id: 'notebook', label: 'Libreta', icon: NotebookIcon },
+    { id: 'smartphone', label: 'Móvil', icon: PhoneIcon },
+] as const;
 
 export default function App() {
   // --- STATE ---
@@ -192,7 +214,7 @@ export default function App() {
     }
   };
 
-  const handleCreateMockup = async (type: 't-shirt' | 'business-card' | 'signage') => {
+  const handleCreateMockup = async (type: any) => {
       if (!generatedImage) return;
       setMockupStatus('loading');
       try {
@@ -502,7 +524,7 @@ export default function App() {
                                     className="absolute bottom-4 right-4 p-3 bg-white dark:bg-warm-gray-800 text-warm-gray-900 dark:text-white rounded-full shadow-lg hover:bg-warm-gray-50 dark:hover:bg-warm-gray-700 transition-all"
                                     title="Descargar"
                                 >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    <DownloadIcon className="w-5 h-5" />
                                 </a>
                              </div>
                              <div className="p-6 border-t border-warm-gray-100 dark:border-warm-gray-800">
@@ -514,19 +536,20 @@ export default function App() {
                                 </div>
 
                                 {/* ACTIONS GRID */}
-                                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-6">
-                                    <button onClick={() => handleCreateMockup('t-shirt')} className="flex flex-col items-center justify-center p-3 rounded-lg bg-warm-gray-50 dark:bg-warm-gray-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors group">
-                                        <TShirtIcon className="w-6 h-6 text-warm-gray-600 dark:text-warm-gray-400 group-hover:text-amber-500 mb-1" />
-                                        <span className="text-[10px] font-medium uppercase tracking-wide text-warm-gray-500 group-hover:text-amber-600">Camiseta</span>
-                                    </button>
-                                    <button onClick={() => handleCreateMockup('business-card')} className="flex flex-col items-center justify-center p-3 rounded-lg bg-warm-gray-50 dark:bg-warm-gray-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors group">
-                                        <CardIcon className="w-6 h-6 text-warm-gray-600 dark:text-warm-gray-400 group-hover:text-amber-500 mb-1" />
-                                        <span className="text-[10px] font-medium uppercase tracking-wide text-warm-gray-500 group-hover:text-amber-600">Tarjeta</span>
-                                    </button>
-                                    <button onClick={() => handleCreateMockup('signage')} className="flex flex-col items-center justify-center p-3 rounded-lg bg-warm-gray-50 dark:bg-warm-gray-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors group">
-                                        <SignIcon className="w-6 h-6 text-warm-gray-600 dark:text-warm-gray-400 group-hover:text-amber-500 mb-1" />
-                                        <span className="text-[10px] font-medium uppercase tracking-wide text-warm-gray-500 group-hover:text-amber-600">Letrero</span>
-                                    </button>
+                                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
+                                    {/* RENDER 8 MOCKUPS BUTTONS */}
+                                    {MOCKUP_TYPES.map((mockup) => (
+                                        <button 
+                                            key={mockup.id}
+                                            onClick={() => handleCreateMockup(mockup.id)} 
+                                            className="flex flex-col items-center justify-center p-3 rounded-lg bg-warm-gray-50 dark:bg-warm-gray-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors group"
+                                        >
+                                            <mockup.icon className="w-6 h-6 text-warm-gray-600 dark:text-warm-gray-400 group-hover:text-amber-500 mb-1" />
+                                            <span className="text-[10px] font-medium uppercase tracking-wide text-warm-gray-500 group-hover:text-amber-600">{mockup.label}</span>
+                                        </button>
+                                    ))}
+
+                                    {/* RENDER SOCIAL & GUIDELINES BUTTONS */}
                                     <button onClick={handleSocialPost} className="flex flex-col items-center justify-center p-3 rounded-lg bg-warm-gray-50 dark:bg-warm-gray-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors group">
                                         <ShareIcon className="w-6 h-6 text-warm-gray-600 dark:text-warm-gray-400 group-hover:text-amber-500 mb-1" />
                                         <span className="text-[10px] font-medium uppercase tracking-wide text-warm-gray-500 group-hover:text-amber-600">Social</span>
@@ -579,9 +602,22 @@ export default function App() {
                         {Object.keys(mockups).length > 0 && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {Object.entries(mockups).map(([key, url]) => (
-                                    <div key={key} className="relative rounded-xl overflow-hidden shadow-lg group">
+                                    <div key={key} className="relative rounded-xl overflow-hidden shadow-lg group bg-warm-gray-100 dark:bg-warm-gray-800">
                                         <img src={url} alt={key} className="w-full h-48 object-cover" />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                                        
+                                        {/* Overlay with Download Button */}
+                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                                            <a 
+                                                href={url} 
+                                                download={`${businessName || 'brand'}-${key}.png`}
+                                                className="p-3 bg-white text-warm-gray-900 rounded-full shadow-lg hover:bg-warm-gray-100 transform hover:scale-110 transition-all"
+                                                title={`Descargar ${key}`}
+                                            >
+                                                <DownloadIcon className="w-6 h-6" />
+                                            </a>
+                                        </div>
+
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 pointer-events-none">
                                             <p className="text-white text-sm font-medium capitalize">{key}</p>
                                         </div>
                                     </div>
@@ -600,11 +636,29 @@ export default function App() {
                                     </div>
                                     <p className="text-xs font-bold text-warm-gray-900 dark:text-white">{businessName || editName || "tu_negocio"}</p>
                                 </div>
-                                {socialPost.image ? (
-                                    <img src={socialPost.image} alt="Social Post" className="w-full aspect-square object-cover" />
-                                ) : (
-                                    <div className="w-full aspect-square bg-warm-gray-100 flex items-center justify-center text-warm-gray-400">Cargando imagen...</div>
-                                )}
+                                
+                                <div className="relative group">
+                                    {socialPost.image ? (
+                                        <img src={socialPost.image} alt="Social Post" className="w-full aspect-square object-cover" />
+                                    ) : (
+                                        <div className="w-full aspect-square bg-warm-gray-100 flex items-center justify-center text-warm-gray-400">Cargando imagen...</div>
+                                    )}
+                                    
+                                    {/* Overlay with Download Button for Social Post */}
+                                    {socialPost.image && (
+                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                                            <a 
+                                                href={socialPost.image} 
+                                                download={`${businessName || 'brand'}-social-post.png`}
+                                                className="p-3 bg-white text-warm-gray-900 rounded-full shadow-lg hover:bg-warm-gray-100 transform hover:scale-110 transition-all"
+                                                title="Descargar Post"
+                                            >
+                                                <DownloadIcon className="w-6 h-6" />
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="p-4">
                                     <p className="text-sm text-warm-gray-800 dark:text-warm-gray-200">
                                         <span className="font-bold mr-2">{businessName || editName || "tu_negocio"}</span>

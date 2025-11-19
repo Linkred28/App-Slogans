@@ -129,254 +129,329 @@ export const createImageWithGemini = async (businessName: string, industry: stri
   try {
     const model = 'gemini-2.5-flash-image'; 
     
-    // Construcción estricta del prompt basada en inputs del usuario
-    const fullPrompt = `Diseño de logotipo profesional para el negocio llamado "${businessName}". 
-    Industria/Giro: ${industry}. 
-    Estilo Visual: ${style}. 
-    ${description ? `Instrucciones visuales específicas: ${description}.` : ''}
-    ${slogan ? `IMPORTANTE: El diseño debe incluir el eslogan "${slogan}" de forma legible debajo o junto al nombre de la marca.` : ''}
+    // ESTRATEGIA DE TEXTO PRIORITARIO:
+    // Movemos el texto al INICIO del prompt para maximizar la atención del modelo.
+    // Usamos instrucciones de "renderizado verbatim".
     
-    Requisitos:
-    1. El texto "${businessName}" debe ser el elemento central y legible.
-    2. ${slogan ? `El eslogan "${slogan}" debe ser más pequeño pero legible.` : 'No incluir texto adicional aparte del nombre.'}
-    3. Fondo blanco limpio y minimalista.
-    4. Alta resolución, diseño vectorial, estético y profesional.
-    5. El diseño debe ser 100% coherente con la industria mencionada.`;
+    const textInstruction = `TEXTO PRINCIPAL DEL LOGO: "${businessName}"
+    ${slogan ? `TEXTO SECUNDARIO (SLOGAN): "${slogan}"` : ''}
+    
+    INSTRUCCIONES CRÍTICAS DE TEXTO:
+    1. Escribe el texto EXACTAMENTE letra por letra. NO cambies la ortografía.
+    2. PRESTA ATENCIÓN EXTREMA a la diferencia entre 'C', 'S' y 'Z'. (Ejemplo: "Casa" vs "Zaza").
+    3. El texto debe ser perfectamente legible, nítido y sin errores tipográficos.
+    4. Si el texto contiene tildes o eñes, inclúyelas correctamente.
+    `;
+
+    const visualInstruction = `
+    TAREA: Crear un diseño de logotipo vectorizado profesional para la industria: ${industry}.
+    ESTILO VISUAL: ${style}.
+    ${description ? `DETALLES ESPECÍFICOS: ${description}.` : ''}
+    
+    COMPOSICIÓN:
+    - Fondo blanco sólido o neutro limpio.
+    - Diseño centrado y equilibrado.
+    - Alta calidad, estilo premium.
+    `;
+
+    const fullPrompt = `${textInstruction}\n\n${visualInstruction}`;
 
     const response = await ai.models.generateContent({
-        model,
-        contents: {
-            parts: [
-                { text: fullPrompt }
-            ]
-        },
-        config: {
-            responseModalities: [Modality.IMAGE]
-        }
+      model,
+      contents: {
+        parts: [{ text: fullPrompt }],
+      },
+      config: {
+          responseModalities: [Modality.IMAGE],
+      }
     });
 
     const candidates = response.candidates;
-    if (candidates && candidates[0]?.content?.parts) {
-        for (const part of candidates[0].content.parts) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
-        }
+    if (candidates && candidates[0] && candidates[0].content && candidates[0].content.parts) {
+       const part = candidates[0].content.parts.find(p => p.inlineData);
+       if (part && part.inlineData) {
+           return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+       }
     }
-    throw new Error("No se generó imagen de respuesta.");
-
+    throw new Error("No se pudo generar la imagen (sin datos).");
   } catch (error) {
-    console.error("Error al crear imagen:", error);
-    throw new Error("No se pudo generar el logo. Intenta ajustar la descripción.");
+    console.error("Error creating image:", error);
+    throw error;
   }
 };
 
 /**
- * Edita o genera variaciones de un logo existente.
+ * Edita un logo existente.
  */
 export const editImageWithGemini = async (imageBase64: string, instructions: string): Promise<string> => {
-  try {
-    const model = 'gemini-2.5-flash-image';
-    
-    const imagePart = {
-        inlineData: {
-            data: imageBase64.split(',')[1],
-            mimeType: 'image/png'
-        }
-    };
-
-    const response = await ai.models.generateContent({
-        model,
-        contents: {
-            parts: [
-                imagePart,
-                { text: `Sigue estas instrucciones para modificar/recrear este logo: ${instructions}. Mantén la esencia pero aplica los cambios. Alta calidad, fondo blanco.` }
-            ]
-        },
-        config: {
-            responseModalities: [Modality.IMAGE]
-        }
-    });
-
-    const candidates = response.candidates;
-    if (candidates && candidates[0]?.content?.parts) {
-        for (const part of candidates[0].content.parts) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
-        }
-    }
-    throw new Error("No se generó imagen de respuesta.");
-  } catch (error) {
-    console.error("Error al editar imagen:", error);
-    throw new Error("No se pudo editar el logo.");
-  }
-};
-
-/**
- * Genera un Kit de Marca inicial (Colores, Tipografía) analizando el logo o la descripción.
- */
-export const getInitialBrandKit = async (businessName: string, industry: string, imageBase64?: string): Promise<{ colors: { hex: string }[], typography: { headingFont: string, bodyFont: string } }> => {
     try {
-        const model = 'gemini-2.5-flash';
-        let parts: Part[] = [];
-        
-        if (imageBase64) {
-            parts.push({
-                inlineData: {
-                    data: imageBase64.split(',')[1],
-                    mimeType: 'image/png'
-                }
-            });
-            parts.push({ text: "Analiza este logo y extrae su paleta de colores principal y sugiere tipografías que combinen." });
-        } else {
-            parts.push({ text: `Para el negocio "${businessName}" de la industria "${industry}", sugiere una paleta de colores profesional y tipografía adecuada.` });
-        }
+        const model = 'gemini-2.5-flash-image';
+        const imagePart = {
+            inlineData: {
+                mimeType: 'image/png', // Asumimos png o detectamos
+                data: imageBase64.split(',')[1],
+            },
+        };
 
-        parts.push({ text: `Devuelve un objeto JSON con: 
-        1. "colors": array de 5 objetos { "hex": "#RRGGBB", "name": "Nombre en Español" }.
-        2. "typography": objeto con "headingFont" (nombre fuente popular) y "bodyFont" (nombre fuente popular).
-        Responde SOLO con JSON limpio.` });
+        // Forzamos la preservación del texto en la edición también
+        const strictInstructions = `
+        PRIORIDAD MÁXIMA: PRESERVAR LA ORTOGRAFÍA DEL TEXTO.
+        Si el logo original tiene texto, o si las instrucciones piden nuevo texto, asegúrate de que se escriba PERFECTAMENTE.
+        No confundas letras (Z por C, S por C, T por C).
+        
+        INSTRUCCIONES DE EDICIÓN: ${instructions}
+        `;
 
         const response = await ai.models.generateContent({
             model,
-            contents: { parts },
-            config: { responseMimeType: "application/json" }
+            contents: {
+                parts: [
+                    imagePart,
+                    { text: strictInstructions }
+                ]
+            },
+            config: {
+                responseModalities: [Modality.IMAGE],
+            }
         });
-
-        const cleanText = cleanJSON(response.text);
-        const result = JSON.parse(cleanText);
-        // Normalizar salida
-        return {
-            colors: result.colors.map((c: any) => ({ hex: c.hex, name: c.name })),
-            typography: result.typography
-        };
+         const candidates = response.candidates;
+        if (candidates && candidates[0] && candidates[0].content && candidates[0].content.parts) {
+           const part = candidates[0].content.parts.find(p => p.inlineData);
+           if (part && part.inlineData) {
+               return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+           }
+        }
+        throw new Error("No se pudo editar la imagen.");
     } catch (error) {
-        console.error("Error obteniendo brand kit:", error);
-        // Fallback
+        console.error("Error editing image:", error);
+        throw error;
+    }
+}
+
+/**
+ * Genera un Kit de Marca inicial (Colores, Tipografía) basado en la imagen.
+ */
+export const getInitialBrandKit = async (name: string, industry: string, logoImageBase64: string) => {
+    try {
+        const model = 'gemini-2.5-flash';
+         const imagePart = {
+            inlineData: {
+                mimeType: 'image/png',
+                data: logoImageBase64.split(',')[1],
+            },
+        };
+        
+        const prompt = `Actúa como un director de arte experto. Analiza este logo diseñado para "${name}" (${industry}).
+        Extrae y define:
+        1. Una paleta de colores de 4-5 colores hexadecimales que coincidan perfectamente con el logo.
+        2. Sugiere 2 fuentes (Google Fonts) que combinen bien (una para Títulos, otra para Cuerpo).
+        
+        Responde EXCLUSIVAMENTE con este JSON schema:
+        {
+          "colors": [{"hex": "#...", "name": "Nombre Creativo"}],
+          "typography": {"headingFont": "Nombre Fuente", "bodyFont": "Nombre Fuente"}
+        }`;
+
+        const response = await ai.models.generateContent({
+            model,
+            contents: {
+                parts: [imagePart, { text: prompt }]
+            },
+             config: { 
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        colors: { 
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    hex: { type: Type.STRING },
+                                    name: { type: Type.STRING }
+                                }
+                            }
+                        },
+                        typography: {
+                            type: Type.OBJECT,
+                            properties: {
+                                headingFont: { type: Type.STRING },
+                                bodyFont: { type: Type.STRING }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        const jsonStr = cleanJSON(response.text);
+        return JSON.parse(jsonStr);
+    } catch (error) {
+        console.error("Error generating brand kit:", error);
+        // Fallback data
         return {
-            colors: [{ hex: '#1C1C1E' }, { hex: '#F59E0B' }, { hex: '#FFFFFF' }, { hex: '#E0E0E0' }, { hex: '#4A4A4C' }],
+            colors: [{hex: '#333333'}, {hex: '#F59E0B'}, {hex: '#FFFFFF'}, {hex: '#cccccc'}],
             typography: { headingFont: 'Inter', bodyFont: 'Roboto' }
         };
     }
 };
 
 /**
- * Genera un Mockup visual.
+ * Genera Mockups realistas.
  */
-export const generateMockup = async (logoBase64: string, type: 't-shirt' | 'business-card' | 'signage'): Promise<string> => {
+export const generateMockup = async (logoImageBase64: string, mockupType: 't-shirt' | 'business-card' | 'signage' | 'hoodie' | 'mug' | 'neon' | 'notebook' | 'smartphone' | 'pen' | 'thermos' | 'tote-bag'): Promise<string> => {
     try {
-         const model = 'gemini-2.5-flash-image';
-         const prompts = {
-             't-shirt': "Una fotografía realista de una playera (camiseta) de alta calidad doblada sobre una mesa de madera, con este logotipo impreso en el pecho. Iluminación cinemática.",
-             'business-card': "Una fotografía macro profesional de tarjetas de presentación (visita) apiladas en un escritorio elegante, mostrando este logotipo claramente en el centro. Profundidad de campo.",
-             'signage': "Una foto de un letrero moderno en la fachada de un edificio o tienda, mostrando este logotipo. Estilo urbano, luz natural."
-         };
-
-         const response = await ai.models.generateContent({
-             model,
-             contents: {
-                 parts: [
-                     { inlineData: { data: logoBase64.split(',')[1], mimeType: 'image/png' } },
-                     { text: prompts[type] }
-                 ]
-             },
-             config: { responseModalities: [Modality.IMAGE] }
-         });
-
-        const candidates = response.candidates;
-        if (candidates && candidates[0]?.content?.parts) {
-            for (const part of candidates[0].content.parts) {
-                if (part.inlineData) {
-                    return `data:image/png;base64,${part.inlineData.data}`;
-                }
-            }
-        }
-        throw new Error("No se generó imagen.");
-    } catch (error) {
-        console.error("Error generando mockup:", error);
-        throw error;
-    }
-};
-
-/**
- * Genera contenido para redes sociales (Caption + Idea de imagen).
- */
-export const generateSocialPost = async (brandName: string, logoBase64: string, topic: string): Promise<{ image: string, caption: string }> => {
-    try {
-        // 1. Generar el caption
-        const textModel = 'gemini-2.5-flash';
-        const textResp = await ai.models.generateContent({
-            model: textModel,
-            contents: `Escribe un post de Instagram atractivo y profesional para la marca "${brandName}". Tema: "${topic}".
-            Incluye emojis relevantes. El tono debe ser inspirador y mexicano.
-            Usa hashtags.
-            Longitud máxima: 280 caracteres.`
-        });
-        const caption = textResp.text;
-
-        // 2. Generar la imagen del post
-        const imageModel = 'gemini-2.5-flash-image';
-        const imgResp = await ai.models.generateContent({
-            model: imageModel,
-            contents: {
-                parts: [
-                    { inlineData: { data: logoBase64.split(',')[1], mimeType: 'image/png' } },
-                    { text: `Crea una imagen cuadrada para redes sociales (Instagram) para la marca "${brandName}". Tema: "${topic}". La imagen debe ser estéticamente agradable, estilo lifestyle o fotografía de producto, e incorporar sutilmente el logo o sus colores.` }
-                ]
+        const model = 'gemini-2.5-flash-image';
+        const imagePart = {
+            inlineData: {
+                mimeType: 'image/png',
+                data: logoImageBase64.split(',')[1],
             },
-            config: { responseModalities: [Modality.IMAGE] }
-        });
+        };
         
-        let image = "";
-        if (imgResp.candidates?.[0]?.content?.parts) {
-            for (const part of imgResp.candidates[0].content.parts) {
-                if (part.inlineData) {
-                    image = `data:image/png;base64,${part.inlineData.data}`;
-                }
-            }
+        let promptDetail = "";
+        switch(mockupType) {
+            case 't-shirt': promptDetail = "una camiseta blanca de alta calidad doblada sobre una superficie de madera, iluminación suave de estudio"; break;
+            case 'hoodie': promptDetail = "una sudadera (hoodie) gris jaspeado o negra, estilo streetwear moderno, colgada o sobre superficie urbana limpia"; break;
+            case 'business-card': promptDetail = "tarjetas de presentación elegantes sobre una mesa de mármol, profundidad de campo, render realista"; break;
+            case 'signage': promptDetail = "un letrero corporativo moderno montado en la pared de un edificio de oficinas, vidrio y metal, 3d render"; break;
+            case 'mug': promptDetail = "una taza de cerámica blanca clásica sobre un escritorio de trabajo con luz natural, estilo lifestyle"; break;
+            case 'neon': promptDetail = "un letrero de NEÓN brillante y eléctrico montado sobre una pared de ladrillo oscuro o texturizada. El logo debe brillar intensamente con colores vibrantes, efecto nocturno, alta calidad cinematográfica"; break;
+            case 'notebook': promptDetail = "una libreta o cuaderno de notas premium de tapa dura, cerrada, sobre un escritorio ordenado, estilo papelería corporativa"; break;
+            case 'smartphone': promptDetail = "un smartphone moderno (iPhone o similar) mostrando el logo en la pantalla como fondo de pantalla, sostenido por una mano o sobre una mesa tecnológica"; break;
+            case 'pen': promptDetail = "un bolígrafo corporativo elegante y minimalista de metal o acabado mate de alta calidad, descansando sobre una agenda o superficie de oficina limpia, primer plano detallado"; break;
+            case 'thermos': promptDetail = "una botella térmica o termo de acero inoxidable moderno (water bottle) sobre una mesa de madera clara o en un entorno de gimnasio elegante, diseño minimalista"; break;
+            case 'tote-bag': promptDetail = "una bolsa de tela (tote bag) de algodón natural o lona ecológica, colgada de un hombro o apoyada sobre una silla, con texturas de tela realistas"; break;
+            default: promptDetail = "producto promocional profesional";
         }
 
-        return { caption, image };
-
-    } catch (error) {
-        console.error("Error generando social post:", error);
-        throw error;
-    }
-};
-
-/**
- * Genera guías de marca textuales.
- */
-export const generateBrandGuidelines = async (brandName: string, logoBase64: string): Promise<any> => {
-    try {
-        const model = 'gemini-2.5-flash';
-        // Se asume que pasamos el logo para análisis visual
-        const parts: Part[] = [
-            { inlineData: { data: logoBase64.split(',')[1], mimeType: 'image/png' } },
-            { text: `Actúa como un Director Creativo experto. Para la marca "${brandName}" (cuyo logo adjunto), genera un breve manual de identidad en formato JSON en Español de México.
-            
-            Campos requeridos:
-            - logoPhilosophy: Explicación breve (40 palabras) del significado del logo.
-            - clearSpaceRule: Regla de espacio libre (1 frase).
-            - minimumSize: Tamaño mínimo recomendado (ej. 20px).
-            - colorUsage: Array de 2 strings con reglas de uso de color (ej. "Usar fondo oscuro para...").
-            - logoMisuse: Array de 3 cosas que NO hacer con el logo.
-            - toneOfVoice: Array de 3 adjetivos que describan la voz de la marca.
-            
-            Responde SOLO JSON limpio.` }
-        ];
+        // MOCKUP PROTECTION STRATEGY:
+        // Instruimos explícitamente que NO re-dibuje el texto, sino que lo trate como una imagen plana.
+        const fullPrompt = `
+        ESTRICTO: MANTÉN EL LOGO EXACTAMENTE COMO ES. NO CAMBIES EL TEXTO. NO CORRIJAS LA ORTOGRAFÍA (usa la original).
+        Coloca este logo de manera realista en ${promptDetail}. 
+        El logo debe adaptarse a la perspectiva, iluminación y textura del objeto. 
+        Mantén la integridad visual y textual del logo original al 100%. Fotografía de producto profesional, 4k.`;
 
         const response = await ai.models.generateContent({
             model,
-            contents: { parts },
-            config: { responseMimeType: "application/json" }
+            contents: {
+                parts: [imagePart, { text: fullPrompt }]
+            },
+             config: {
+                responseModalities: [Modality.IMAGE],
+            }
         });
 
-        const cleanText = cleanJSON(response.text);
-        return JSON.parse(cleanText);
+         const candidates = response.candidates;
+        if (candidates && candidates[0] && candidates[0].content && candidates[0].content.parts) {
+           const part = candidates[0].content.parts.find(p => p.inlineData);
+           if (part && part.inlineData) {
+               return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+           }
+        }
+        throw new Error("No se pudo generar el mockup.");
     } catch (error) {
-        console.error("Error generando guías:", error);
+        console.error("Error generating mockup:", error);
         throw error;
     }
 };
+
+/**
+ * Genera Post para Redes Sociales.
+ */
+export const generateSocialPost = async (brandName: string, logoImageBase64: string, topic: string) => {
+    try {
+        // 1. Generar Imagen del Post
+        const imageModel = 'gemini-2.5-flash-image';
+        const imagePart = {
+             inlineData: { mimeType: 'image/png', data: logoImageBase64.split(',')[1] }
+        };
+        
+        const imagePrompt = `
+        MANTÉN EL TEXTO DEL LOGO INTACTO.
+        Crea una imagen cuadrada para Instagram estética y moderna para la marca "${brandName}". 
+        Tema: ${topic}. 
+        Estilo: Minimalista, profesional, usa los colores del logo sutilmente. 
+        El logo debe aparecer integrado en el diseño de forma elegante (marca de agua o esquina, o elemento central).
+        `;
+
+        const imgResponse = await ai.models.generateContent({
+            model: imageModel,
+            contents: { parts: [imagePart, { text: imagePrompt }] },
+            config: { responseModalities: [Modality.IMAGE] }
+        });
+        
+        let postImage = null;
+        const candidates = imgResponse.candidates;
+        if (candidates && candidates[0]?.content?.parts) {
+           const part = candidates[0].content.parts.find(p => p.inlineData);
+           if (part && part.inlineData) {
+               postImage = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+           }
+        }
+
+        // 2. Generar Copy (Texto)
+        const textModel = 'gemini-2.5-flash';
+        const textPrompt = `Escribe un caption corto y atractivo para Instagram para la marca "${brandName}" sobre el tema: "${topic}". Usa emojis. Tono profesional pero cercano. Máximo 30 palabras.`;
+        
+        const textResponse = await ai.models.generateContent({
+            model: textModel,
+            contents: textPrompt
+        });
+        
+        return {
+            image: postImage,
+            caption: textResponse.text
+        };
+
+    } catch (error) {
+        console.error("Error generating social post:", error);
+        throw error;
+    }
+}
+
+/**
+ * Genera Guías de Marca (Texto).
+ */
+export const generateBrandGuidelines = async (brandName: string, logoImageBase64: string) => {
+    try {
+        const model = 'gemini-2.5-flash';
+        const imagePart = {
+             inlineData: { mimeType: 'image/png', data: logoImageBase64.split(',')[1] }
+        };
+        
+        const prompt = `Analiza este logo de "${brandName}". Genera un breve manual de identidad en formato JSON.
+        Incluye:
+        1. "logoPhilosophy": Breve explicación (1 frase) del significado del logo.
+        2. "clearSpaceRule": Regla de espacio seguro sugerida.
+        3. "minimumSize": Tamaño mínimo sugerido (px).
+        4. "logoMisuse": Lista de 3 cosas que NO hacer con el logo (ej. no estirar, no cambiar color).
+        
+        JSON Schema:
+        {
+            "logoPhilosophy": string,
+            "clearSpaceRule": string,
+            "minimumSize": string,
+            "logoMisuse": string[]
+        }`;
+
+        const response = await ai.models.generateContent({
+            model,
+            contents: { parts: [imagePart, { text: prompt }] },
+            config: { responseMimeType: "application/json" }
+        });
+        
+        const jsonStr = cleanJSON(response.text);
+        return JSON.parse(jsonStr);
+
+    } catch (error) {
+        console.error("Error generating guidelines:", error);
+         return {
+            logoPhilosophy: "Una representación visual moderna de la marca.",
+            clearSpaceRule: "Mantener un margen del 20% del ancho del logo.",
+            minimumSize: "32px de ancho",
+            logoMisuse: ["No distorsionar proporciones", "No usar sobre fondos del mismo color", "No rotar"]
+        };
+    }
+}
