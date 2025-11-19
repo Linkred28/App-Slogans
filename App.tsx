@@ -41,6 +41,7 @@ const DownloadIcon: React.FC<{className?: string}> = ({ className }) => ( <svg c
 const PenIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> );
 const ThermosIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg> );
 const ToteIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg> );
+const ArrowPathIcon: React.FC<{className?: string}> = ({ className }) => ( <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg> );
 
 const STYLES = ["Minimalista", "Moderno", "Vintage", "Geométrico", "3D", "Abstracto", "Lujo", "Orgánico", "Tecnológico", "Retro"];
 const EDIT_STYLES = ["Mantener Original", ...STYLES];
@@ -113,6 +114,34 @@ export default function App() {
 
   // --- HANDLERS ---
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+
+  const handleReset = () => {
+    // Reset shared outputs
+    setGeneratedImage(null);
+    setStatus('idle');
+    setError(null);
+    setBrandKit(null);
+    setMockups({});
+    setMockupStatus('idle');
+    setSocialPost(null);
+    setGuidelines(null);
+    setLoadingMessage('');
+
+    // Reset mode specific inputs
+    if (mode === 'create') {
+        setBusinessName('');
+        setIndustry('');
+        setLogoDescription('');
+        setSlogan('');
+        setGeneratedSlogans([]);
+        setSelectedStyle('Minimalista');
+    } else {
+        setUploadedImage(null);
+        setEditName('');
+        setEditInstructions('');
+        setEditStyle('Mantener Original');
+    }
+  };
 
   const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -297,10 +326,20 @@ export default function App() {
             <div className="space-y-8 animate-fadeInUp">
                 <div className="bg-white dark:bg-warm-gray-900 p-6 rounded-2xl shadow-xl shadow-warm-gray-200/50 dark:shadow-none border border-warm-gray-100 dark:border-warm-gray-800">
                     
-                    <h2 className="text-2xl font-bold mb-6 text-warm-gray-900 dark:text-white flex items-center gap-2">
-                        <SparklesIcon className="w-6 h-6 text-amber-500" />
-                        {mode === 'create' ? 'Datos del Negocio' : 'Transforma tu Logo'}
-                    </h2>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-warm-gray-900 dark:text-white flex items-center gap-2">
+                            <SparklesIcon className="w-6 h-6 text-amber-500" />
+                            {mode === 'create' ? 'Datos del Negocio' : 'Transforma tu Logo'}
+                        </h2>
+                        <button 
+                            onClick={handleReset}
+                            className="text-xs flex items-center gap-1 text-warm-gray-500 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-warm-gray-50 dark:hover:bg-warm-gray-800"
+                            title="Borrar todo y empezar de nuevo"
+                        >
+                            <ArrowPathIcon className="w-4 h-4" />
+                            Limpiar
+                        </button>
+                    </div>
 
                     {mode === 'create' ? (
                         <div className="space-y-6">
