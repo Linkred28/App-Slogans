@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copiloto de Marca IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // CONFIGURACIÓN DE TAILWINDCSS
+      tailwind.config = {
+        darkMode: 'class', // Habilitar modo oscuro basado en clases
+        theme: {
+          extend: {
+            colors: {
+              'warm-gray': {
+                50: '#F7F7F7',
+                100: '#EFEFEF',
+                200: '#E0E0E0',
+                300: '#D1D1D1',
+                700: '#4A4A4C',
+                800: '#3A3A3C',
+                900: '#2A2A2C',
+                950: '#1C1C1E',
+              },
+              amber: {
+                500: '#F59E0B',
+                600: '#D97706',
+                700: '#B45309',
+              },
+              charcoal: {
+                800: '#333333',
+                900: '#1E1E1E'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <script>
+      // SCRIPT PARA EVITAR EL "FLASH" DEL TEMA INCORRECTO (FOUC)
+      // Se ejecuta inmediatamente para establecer la clase 'dark' o 'light' antes de que React se renderice.
+      (function() {
+        function getInitialTheme() {
+          try {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) {
+              return storedTheme;
+            }
+            // Si no hay tema guardado, usar la preferencia del sistema
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          } catch (e) {
+            // En caso de error (e.g., localStorage no disponible), usar light por defecto
+            return 'light';
+          }
+        }
+        document.documentElement.className = getInitialTheme();
+      })();
+    </script>
+    <style>
+      :root {
+        --gradient-animation-duration: 15s;
+        --amber-500-rgb: 245, 158, 11; /* Para usar en rgba() */
+      }
+
+      /* Estilos base para transiciones suaves de color */
+      body, .bg-transition {
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(270deg, #1c1c1e, #2a2a2c, #1c1c1e);
+        background-size: 400% 400%;
+        animation: animate-gradient var(--gradient-animation-duration) ease infinite;
+      }
+      html.light body {
+        background: linear-gradient(270deg, #f7f7f7, #efefef, #f7f7f7);
+        background-size: 400% 400%;
+        animation: animate-gradient var(--gradient-animation-duration) ease infinite;
+      }
+
+      .checkerboard-dark {
+        background-image:
+            linear-gradient(45deg, #3a3a3c 25%, transparent 25%),
+            linear-gradient(-45deg, #3a3a3c 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #3a3a3c 75%),
+            linear-gradient(-45deg, transparent 75%, #3a3a3c 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        background-color: #2a2a2c;
+      }
+      .checkerboard-light {
+        background-image:
+            linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
+            linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
+            linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        background-color: #efefef;
+      }
+
+      /* Estilos de selección personalizados para ambos temas */
+      ::selection {
+        background-color: #F59E0B; /* amber-500 */
+        color: #1C1C1E; /* warm-gray-950 */
+      }
+
+      /* --- Animaciones de Interactividad IA --- */
+      @keyframes animate-gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      
+      @keyframes shimmer-effect {
+        0% { transform: translateX(-100%) skewX(-20deg); }
+        100% { transform: translateX(200%) skewX(-20deg); }
+      }
+      
+      @keyframes scanline {
+        0% { top: -10px; opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+      }
+
+      .shimmer-effect {
+        position: relative;
+        overflow: hidden;
+      }
+      .shimmer-effect::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        animation: shimmer-effect 3s infinite;
+        animation-delay: 1.5s;
+      }
+
+      .ai-reveal {
+        position: relative;
+        overflow: hidden;
+      }
+      .ai-reveal::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: rgba(var(--amber-500-rgb), 0.6);
+        box-shadow: 0 0 15px 2px rgba(var(--amber-500-rgb), 0.5);
+        filter: blur(1px);
+        animation: scanline 0.7s ease-out forwards;
+      }
+
+      /* Color de cursor personalizado para entradas de texto */
+      input, textarea {
+        caret-color: #D97706; /* amber-600 */
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fadeInUp {
+        animation: fadeInUp 0.5s ease-in-out forwards;
+      }
+    </style>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-warm-gray-50 dark:bg-warm-gray-950 text-charcoal-800 dark:text-slate-200 bg-transition">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
