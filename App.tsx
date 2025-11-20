@@ -174,6 +174,18 @@ export default function App() {
       }
   }
 
+  // Helper to parse generic API errors
+  const parseError = (err: any) => {
+      let msg = err.message || JSON.stringify(err) || "Ocurrió un error inesperado";
+      if (msg.includes("429") || msg.includes("quota") || msg.includes("RESOURCE_EXHAUSTED")) {
+          return "El servicio está saturado (Límite de cuota). Por favor espera unos momentos antes de intentar de nuevo.";
+      }
+      if (msg.includes("503")) {
+          return "Servicio temporalmente no disponible. Intenta de nuevo.";
+      }
+      return msg;
+  };
+
   const handleGenerate = async () => {
     setStatus('loading');
     setError(null);
@@ -238,7 +250,7 @@ export default function App() {
       }
       setStatus('success');
     } catch (err: any) {
-      setError(err.message || "Ocurrió un error inesperado");
+      setError(parseError(err));
       setStatus('error');
     }
   };
@@ -250,8 +262,10 @@ export default function App() {
           const res = await generateMockup(generatedImage, type);
           setMockups(prev => ({...prev, [type]: res}));
           setMockupStatus('success');
-      } catch (e) {
+      } catch (err: any) {
           setMockupStatus('error');
+          // Optional: show toast or small error for mockup failure
+          console.error(parseError(err));
       }
   };
 
@@ -262,8 +276,9 @@ export default function App() {
           const res = await generateSocialPost(businessName || editName || "Tu Marca", generatedImage, "Lanzamiento de marca");
           setSocialPost(res);
           setStatus('success');
-      } catch (e) {
+      } catch (err: any) {
           setStatus('error');
+          setError(parseError(err));
       }
   };
 
@@ -274,8 +289,9 @@ export default function App() {
           const res = await generateBrandGuidelines(businessName || editName || "Tu Marca", generatedImage);
           setGuidelines(res);
           setStatus('success');
-      } catch (e) {
+      } catch (err: any) {
           setStatus('error');
+          setError(parseError(err));
       }
   };
 
